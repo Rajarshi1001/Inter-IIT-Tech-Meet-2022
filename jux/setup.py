@@ -1,11 +1,15 @@
 from subprocess import list2cmdline
 from setuptools import setup
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
-    name="jux",
-    version="0.0.1",
-    description="xray flare burst deterministic detection",
-    long_description="A library that has deterministic algorithms implemented to detect the features of xray bursts in a light curve.",
+    name="Jux",
+    version="0.0.2",
+    description="X-RAY Flare Burst Deterministic Detection",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Team 10",
     packages=[".jux"],
     install_requires=[

@@ -1,56 +1,51 @@
-# JuX : Solar X-Ray Burst Detector
+# Jux : Solar X-Ray Burst Detector
 
-<img align="right" style="padding-left: 20px" width="190" height="190" src="./assets/logo.jpg">
+<!-- <img align="right" style="padding-left: 20px" width="190" height="190" src="./assets/logo.jpg"> -->
 
-This package was created by Team 10 on the account of Inter IIT Techmeet 10.
-It's concerned with identification and analysis of solar xray bursts in provided light curves.
+<!-- This package was created by Team 10 on the account of Inter IIT Techmeet 10. -->
+This package is concerned with identification and analysis of solar xray bursts in provided light curves. This package enables the user to analyse a lightcurve file through a multi-filter based approach resulting in a less noisy data and important flare paramters that can be fed to a Machine Learning Model for the detection of outliers among the flares in the given lightcurve.
 
 ## How to install it?  
-While being in the `jux` package directory, do
 
 ```bash
-pip install .
+pip install jux
 ```
 
 Dependencies will build and you can proceed using it.
 
-This is the package structure:
+## How to use it?
 
-```
-.
-├── examples
-│   ├── ch2_xsm_20211111_v1_level2.lc
-│   ├── isf.pickle
-│   ├── script_outliers.py
-│   └── script.py
-├── install.sh
-├── jux
-│   ├── create_df_minmax.py
-│   ├── denoise.py
-│   ├── false_positive_detection.py
-│   ├── file_handler.py
-│   ├── flare_detect_minmax.py
-│   ├── flare_detect_thresh.py
-│   ├── helper.py
-│   ├── __init__.py
-│   ├── jux.py
-│   ├── params.py
-│   └── version.py
-├── LICENSE
-├── MANIFEST.in
-├── README.md
-└── setup.py
+Inorder to use this package on a specific lightcurve file import the Lightcurve class from jux.jux. Create an instance of the Lightcurve class passing the path to the LightCurve file as an argument. The Lightcurve class contains mainly two functions: 
+
+- **Lightcurve.main()**
+  - The parameters to the function are:
+
+    1. *picklePath* - The path to an existing Pickle file containing the model parameters.
+    
+    2. *check_false_positives* - This argument is set to **False** by default so the function returns  the dataframe constructed with important parameters obtained from the filtered lightcurve data. Then this dataframe can be passed as an argument to the **Lightcurve.train_classifier()** method which will internally train a RandomForest model and save the model in a pickle file in the working directory. the output of the *train_classifier* method is the dataframe with outlier labels and corresoponds outlier scores. If this is set to **True**, the functions expects the pickle path of the model for inference,
+
+- **Lightcurve.train_classifier()**
+  - The parameters to the function are: 
+    
+    1. *model_zip* - the dataframe containing parameters like "_id", "time_ratio", "intensity_ratio", "bandwidth_1", "bandwidth_2", "error", which is obtained after passing the file to the **main** function.
+
+## Demo 
+```python
+from jux.jux import Lightcurve
+lc = Lightcurve(path_to_lc_file)
+X = lc.main(check_false_positives=False)
+Y = lc.train_classifier(x)
 ```
 
-The main package lies in `./jux`.
+These are the followng submodules present in this package:
 
-- `./jux/helper.py` : Contains helper functions including analytical functions that were fitted to the posterior part of a flare.
-- `./jux/denoise.py` : Contains 3 algorithms including smoothening with fft, smoothening with median windowing and moving average smoothening.
-- `./jux/flare_detect_minmax.py` : Contains 7 deterministic and condition based filters that help pick out bursts from de-noised data.
-- `./jux/jux.py` : The main file containing class `Lightcurve` that accepts file path as argument, The main function will execute all de-noising and filtering and give out flare details and model fitted parameters that can then be used in the Isolation Classifier to detect false positives.
-- `./jux/false_positive_detection.py` : Contains the functions that can be uses sklearn's Isolation Classifier to pick out outliers in the flares detected by the algorithm implemented above.
-- `./jux/params.py` : Contains parameters that control all of the algorithms, context mentioned in the file itself.
-- `./jux/create_df_minmax.py` : Contains functions that handles the dataframe given as the output by filtering.
+- `helper.py` : Contains helper functions including analytical functions that were fitted to the posterior part of a flare.
+- `denoise.py` : Contains 3 algorithms including smoothening with fft, smoothening with median windowing and moving average smoothening.
+- `flare_detect_minmax.py` : Contains 7 deterministic and condition based filters that help pick out bursts from de-noised data.
+- `jux.py` : The main file containing class `Lightcurve` that accepts file path as argument, The main function will execute all de-noising and filtering and give out flare details and model fitted parameters that can then be used in the Isolation Classifier to detect false positives.
+- `false_positive_detection.py` : Contains the functions that can be uses sklearn's Isolation Classifier to pick out outliers in the flares detected by the algorithm implemented above.
+- `params.py` : Contains parameters that control all of the algorithms, context mentioned in the file itself.
+- `create_df_minmax.py` : Contains functions that handles the dataframe given as the output by filtering.
 
 ## Algorithms explained
 
@@ -75,28 +70,5 @@ Lightcurve we trained upon has quite a bit of noise, so for de-noising we tried 
 
 These filters together actually gave a great result in picking out what we perceived as flares, sharp rises and slow decays.
 
-## Examples
 
-The package contains 2 examples to run the algorithm. Check out `./examples/script.py`. To run it:
 
-```bash
-python ./script.py ./ch2_xsm_20211111_v1_level2.lc
-```
-
-This would run the script with this LC Curve as the input signal, you would get the dataframe with features as the output on the terminal itself.
-
-The second script `./examples/script_outliers.py` runs the outlier detector algorithm with premade pickle object of an Isolation Forest. To run it:
-
-```bash
-python ./script_outliers.py ./ch2_xsm_20211111_v1_level2.lc ./isf.pickle
-```
-
-This would add an extra column of if the algorithm thinks that particular flare is an outlier or not.
-
-### Customize
-
-To customize and tweak the algorithm to perform better, you can play around with the values in `./jux/params.py`, though these were the optimum values found after playing around and some paper references.
-
-### Training
-
-Run the algorithm for multiple LC files and make a pickle for yourself with `./jux/false_positive_detection.py`. Check out its function of `train_isolationForest_`. Make a better pickle, else I will try to update this.
