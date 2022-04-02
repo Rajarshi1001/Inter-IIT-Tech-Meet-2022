@@ -6,7 +6,7 @@ with open('README.md') as f:
 
 setup(
     name="Jux",
-    version="0.0.2",
+    version="0.0.3",
     description="X-RAY Flare Burst Deterministic Detection",
     long_description=long_description,
     long_description_content_type="text/markdown",
