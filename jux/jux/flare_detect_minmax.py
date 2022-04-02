@@ -198,7 +198,10 @@ def get_lvl_0_e_(xnew, ynew, _s5, _p5, _s0, should_plot=False):
             ynew,
         )
         plt.show()
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1d1732a23eac509348c345066082204b09f78ccc
     return _e0
 
 
@@ -230,6 +233,5 @@ def get_lvl_1_e_(xnew, ynew, _s0, _p5, _e0, should_plot=False):
             ynew,
         )
         plt.show()
-
     _e1 = np.array(_e1)
     return _e1
